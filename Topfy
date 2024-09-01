@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toon Lab</title>
+    <style>
+        /* Basic styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding-bottom: 60px; /* to avoid content hidden behind fixed footer */
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #444;
+            padding: 10px 0;
+        }
+        nav a {
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
+        .search-bar {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .search-bar input {
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+        }
+        main {
+            padding: 20px;
+        }
+        .anime-list, .episode-list {
+            list-style: none;
+            padding: 0;
+        }
+        .anime-list li, .episode-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .anime-details, .comments-section {
+            margin-top: 20px;
+        }
+        .comments-section textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+        }
+        .comments-section button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .comments-section button:hover {
+            background-color: #555;
+        }
+        .pagination {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .pagination button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .pagination button:hover {
+            background-color: #555;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Toon Lab</h1>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#episodes">Episodes</a>
+        <a href="#contact">Contact</a>
+        <a href="#advertise">Advertise</a>
+    </nav>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search for anime...">
+    </div>
+    <main id="content">
+        <!-- Main Page Content -->
+        <div id="main-page">
+            <h2>Popular Anime in Hindi</h2>
+            <ul class="anime-list" id="animeList">
+                <!-- Anime list items will be dynamically inserted here -->
+            </ul>
+            <div class="pagination">
+                <button id="prevPage" disabled>Previous</button>
+                <button id="nextPage">Next</button>
+            </div>
+        </div>
+        <!-- Anime Details Page Content -->
+        <div id="anime-details" style="display: none;">
+            <h2 id="anime-title"></h2>
+            <p id="anime-description"></p>
+            <ul class="episode-list" id="episode-list"></ul>
+            <div class="comments-section">
+                <h3>Comments</h3>
+                <textarea id="commentInput" placeholder="Write your comment here..."></textarea>
+                <button id="submitComment">Submit Comment</button>
+                <ul id="commentsList" class="comments-list"></ul>
+            </div>
+            <button id="back-to-main">Back to Main Page</button>
+        </div>
+    </main>
+    <footer>
+        <p>© 2024 Toon Lab. All rights reserved.</p>
+    </footer>
+    <script>
+        const animeData = {
+            'alya': {
+                title: 'Alya Sometimes Hides Her Feelings in Russian',
+                description: 'Alya Sometimes Hides Her Feelings in Russian is a romantic comedy anime that explores the love story of Alya and her classmate.',
+                episodes: [
+                    { title: 'Episode 1: The Mysterious Girl', link: 'https://cuty.io/6Yu9gp4jHt' },
+                    { title: 'Episode 2: The Confession', link: 'https://cuty.io/G67a' },
+                    { title: 'Episode 3: The First Date', link: 'https://cuty.io/EY8VQFd3duT' },
+                    { title: 'Episode 4: The Unexpected Meeting', link: 'https://cuty.io/c6Kf5AAzX71N' },
+                    { title: 'Episode 5: The Secret Admirer', link: 'https://cuty.io/ej8AuIV' },
+                    { title: 'Episode 6: The Resolution', link: 'https://cuty.io/LLUBRadYp8J' }
+                ],
+                releaseDay: 'Thursday'
+            },
+            'naruto': {
+                title: 'Naruto',
+                description: 'Naruto follows the story of Naruto Uzumaki, a young ninja with a dream of becoming the strongest ninja and leader of his village.',
+                episodes: [{ title: 'Episode 1: Naruto\'s Ninja Way', link: 'https://example.com/naruto-episode1' }]
+            },
+            'dragon_ball_z': {
+                title: 'Dragon Ball Z',
+                description: 'Dragon Ball Z continues the story of Goku and his friends as they defend Earth from various villains.',
+                episodes: [{ title: 'Episode 1: The Arrival of Raditz', link: 'https://example.com/dragonballz-episode1' }]
+            },
+            'one_piece': {
+                title: 'One Piece',
+                description: 'One Piece follows the adventures of Monkey D. Luffy and his pirate crew as they search for the greatest treasure, the "One Piece."',
+                episodes: [{ title: 'Episode 1: The Beginning of the Journey', link: 'https://example.com/onepiece-episode1' }]
+            },
+            'attack_on_titan': {
+                title: 'Attack on Titan',
+                description: 'Attack on Titan is set in a world where humanity is on the brink of extinction due to giant humanoid creatures known as Titans.',
+                episodes: [{ title: 'Episode 1: To You, in 2000 Years', link: 'https://example.com/attackontitan-episode1' }]
+            }
+        };
+
+        const itemsPerPage = 3;
+        let currentPage = 1;
+
+        function renderAnimeList(page) {
+            const animeList = document.getElementById('animeList');
+            animeList.innerHTML = '';
+
+            const animeKeys = Object.keys(animeData);
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = animeKeys.slice(start, end);
+
+            pageItems.forEach(key => {
+                const listItem = document.createElement('li');
+                listItem.textContent = animeData[key].title;
+                listItem.setAttribute('data-anime', key);
+                animeList.appendChild(listItem);
+            });
+
+            // Update pagination buttons
+            document.getElementById('prevPage').disabled = page === 1;
+            document.getElementById('nextPage').disabled = end >= animeKeys.length;
+
+            // Reattach event listeners to newly added items
+            document.querySelectorAll('.anime-list li').forEach(item => {
+                item.addEventListener('click', function() {
+                    const animeKey = this.getAttribute('data-anime');
+                    const anime = animeData[animeKey];
+
+                    document.getElementById('anime-title').textContent = anime.title;
+                    document.getElementById('anime-description').textContent = anime.description;
+
+                    const episodeList = document.getElementById('episode-list');
+                    episodeList.innerHTML = '';  // Clear previous episodes
+                    anime.episodes.forEach(episode => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<a href="${episode.link}" download>${episode.title}</a>`;
+                        episodeList.appendChild(listItem);
+                    });
+
+                    document.getElementById('main-page').style.display = 'none';
+                    document.getElementById('anime-details').style.display = 'block';
+                });
+            });
+        }
+
+        document.getElementById('nextPage').addEventListener('click', function() {
+            currentPage++;
+            renderAnimeList(currentPage);
+        });
+
+        document.getElementById('prevPage').addEventListener('click', function() {
+            currentPage--;
+            renderAnimeList(currentPage);
+        });
+
+        document.getElementById('back-to-main').addEventListener('click', function() {
+            document.getElementById('anime-details').style.display = 'none';
+            document.getElementById('main-page').style.display = 'block';
+        });
+
+        document.getElementById('submitComment').addEventListener('click', function() {
+            const commentInput = document.getElementById('commentInput');
+            const commentText = commentInput.value.trim();
+
+            if (commentText) {
+                const commentsList = JSON.parse(localStorage.getItem('commentsList')) || [];
+                commentsList.push(commentText);
+                localStorage.setItem('commentsList', JSON.stringify(commentsList));
+                displayComments();
+                commentInput.value = '';  // Clear the input
+            } else {
+                alert('Please enter a comment.');
+            }
+        });
+
+        function displayComments() {
+            const commentsList = JSON.parse(localStorage.getItem('commentsList')) || [];
+            const commentsUl = document.getElementById('commentsList');
+            commentsUl.innerHTML = '';  // Clear existing comments
+
+            commentsList.forEach(comment => {
+                const listItem = document.createElement('li');
+                listItem.textContent = comment;
+                commentsUl.appendChild(listItem);
+            });
+        }
+
+        window.addEventListener('load', function() {
+            displayComments();
+            renderAnimeList(currentPage);
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const animeItems = document.querySelectorAll('.anime-list li');
+
+            animeItems.forEach(item => {
+                const animeName = item.textContent.toLowerCase();
+                if (animeName.includes(searchTerm)) {
+                    item.style.display = ''; // Show item if it matches the search
+                } else {
+                    item.style.display = 'none'; // Hide item if it doesn't match
+                }
+            });
+        });
+    </script>
+</body>
+</html>
